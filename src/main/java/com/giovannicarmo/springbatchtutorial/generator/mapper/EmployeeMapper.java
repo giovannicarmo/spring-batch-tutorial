@@ -7,7 +7,7 @@ import org.mapstruct.factory.Mappers;
 import com.giovannicarmo.springbatchtutorial.domain.Employee;
 import com.giovannicarmo.springbatchtutorial.generator.valueobject.EmployeeVO;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface EmployeeMapper {
 
     EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);

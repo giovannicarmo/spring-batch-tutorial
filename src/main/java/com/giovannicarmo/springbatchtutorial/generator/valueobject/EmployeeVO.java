@@ -22,7 +22,7 @@ public class EmployeeVO {
     public EmployeeVO() {
     }
 
-    public EmployeeVO(String employeeId, String fullName, String lastName, int age, String position) {
+    public EmployeeVO(String employeeId, String fullName, int age, String position) {
         this.employeeId = employeeId;
         this.fullName = fullName;
         this.age = age;

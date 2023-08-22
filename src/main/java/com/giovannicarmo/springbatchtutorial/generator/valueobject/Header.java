@@ -8,16 +8,18 @@ import jakarta.xml.bind.annotation.XmlElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Header {
-    @XmlElement(name = "GENERATED_AT")
-    private LocalDateTime generatedAt;
     @XmlElement(name = "OPERATION_ID")
     private String operationId;
+
+    @XmlElement(name = "GENERATED_AT")
+    private String generatedAt;
 
     public Header() {
     }
 
     public Header(String operationId) {
         this.operationId = operationId;
+        this.generatedAt = LocalDateTime.now().toString();
     }
 
     public String getOperationId() {
@@ -28,11 +30,7 @@ public class Header {
         this.operationId = operationId;
     }
 
-    public LocalDateTime getGeneratedAt() {
+    public String getGeneratedAt() {
         return generatedAt;
-    }
-
-    public void setGeneratedAt() {
-        this.generatedAt = LocalDateTime.now();
     }
 }

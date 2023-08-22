@@ -14,9 +14,9 @@ import jakarta.xml.bind.Marshaller;
 
 @Service
 public class XmlGenerator {
-    public void generate(String operationId, Set<EmployeeVO> employeeVOs) throws JAXBException {
+    public void generate(String rootElementName, String operationId, Set<EmployeeVO> employeeVOs) throws JAXBException {
 
-        XmlWrapper<EmployeeVO> xmlWrapper = new XmlWrapper<>(new Header(operationId), employeeVOs);
+        XmlWrapper<EmployeeVO> xmlWrapper = new XmlWrapper<>(rootElementName, new Header(operationId), employeeVOs);
 
         JAXBContext jaxbContext = JAXBContext.newInstance(XmlWrapper.class, EmployeeVO.class);
         Marshaller marshaller = jaxbContext.createMarshaller();

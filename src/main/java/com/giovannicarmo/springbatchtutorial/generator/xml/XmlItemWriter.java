@@ -2,6 +2,7 @@ package com.giovannicarmo.springbatchtutorial.generator.xml;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
@@ -20,6 +21,6 @@ public class XmlItemWriter implements ItemWriter<EmployeeVO> {
     @Override
     public void write(@NonNull Chunk<? extends EmployeeVO> chunk) throws Exception {
         Set<EmployeeVO> employeeVOs = new HashSet<>(chunk.getItems());
-        xmlGenerator.generate("yourOperationId", employeeVOs);
+        xmlGenerator.generate("EmployeeEvents", UUID.randomUUID().toString(), employeeVOs);
     }
 }
