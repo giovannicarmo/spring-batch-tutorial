@@ -1,16 +1,18 @@
-package com.giovannicarmo.springbatchtutorial;
+package com.giovannicarmo.springbatchtutorial.domain;
 
-public class Person {
+public abstract class Person {
 
-    public String firstName;
-    public String lastName;
+    protected String firstName;
+    protected String lastName;
+    protected int age;
 
     public Person() {
     }
 
-    public Person(String firstName, String lastName) {
+    public Person(String firstName, String lastName, int age) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.age = age;
     }
 
     public void setFirstName(String firstName) {
@@ -27,6 +29,14 @@ public class Person {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 
     @Override

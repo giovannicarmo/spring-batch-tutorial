@@ -8,66 +8,109 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.giovannicarmo.springbatchtutorial.domain.Employee;
+import com.giovannicarmo.springbatchtutorial.generator.valueobject.EmployeeVO;
+import com.giovannicarmo.springbatchtutorial.generator.xml.XmlGenerator;
+import com.giovannicarmo.springbatchtutorial.generator.xml.XmlItemWriter;
+import com.giovannicarmo.springbatchtutorial.processor.EmployeeConverterProcessor;
+import com.giovannicarmo.springbatchtutorial.processor.EmployeeItemProcessor;
+import com.giovannicarmo.springbatchtutorial.reader.EmployeeItemReader;
+import com.giovannicarmo.springbatchtutorial.repository.EmployeeRepository;
+
 @Configuration
 public class BatchConfiguration {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    @Autowired
+    private XmlGenerator xmlGenerator;
+
     @Bean
-    public FlatFileItemReader<Person> reader() {
-        return new FlatFileItemReaderBuilder<Person>()
-                .name("personItemReader")
+    public EmployeeItemProcessor processor() {
+        return new EmployeeItemProcessor();
+    }
+
+    @Bean
+    public EmployeeConverterProcessor employeeConverterProcessor() {
+        return new EmployeeConverterProcessor();
+    }
+
+    @Bean
+    public EmployeeItemReader employeeItemReader() {
+        return new EmployeeItemReader(employeeRepository);
+    }
+
+    @Bean
+    public XmlItemWriter xmlItemWriter() {
+        return new XmlItemWriter(xmlGenerator);
+    }
+
+    @Bean
+    public FlatFileItemReader<Employee> reader() {
+        return new FlatFileItemReaderBuilder<Employee>()
+                .name("employeeItemReader")
                 .resource(new ClassPathResource("sample-data.csv"))
                 .delimited()
-                .names(new String[] { "firstName", "lastName" })
-                .fieldSetMapper(new BeanWrapperFieldSetMapper<Person>() {
+                .names(new String[] { "firstName", "lastName", "age", "employeeId", "position" })
+                .fieldSetMapper(new BeanWrapperFieldSetMapper<Employee>() {
                     {
-                        setTargetType(Person.class);
+                        setTargetType(Employee.class);
                     }
                 })
                 .build();
     }
 
     @Bean
-    public PersonItemProcessor processor() {
-        return new PersonItemProcessor();
-    }
-
-    @Bean
-    public JdbcBatchItemWriter<Person> writer(DataSource dataSource) {
-        return new JdbcBatchItemWriterBuilder<Person>()
+    public JdbcBatchItemWriter<Employee> writer(DataSource dataSource) {
+        return new JdbcBatchItemWriterBuilder<Employee>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("INSERT INTO people (first_name, last_name) VALUES (:firstName, :lastName)")
+                .sql("INSERT INTO employees (first_name, last_name, age, employee_id, position) VALUES (:firstName, :lastName, :age, :employeeId, :position)")
                 .dataSource(dataSource)
                 .build();
     }
 
     @Bean
     public Job importUserJob(JobRepository jobRepository,
-            JobCompletionNotificationListener listener, Step step1) {
+            JobCompletionNotificationListener listener, Step persistenceStep) {
         return new JobBuilder("importUserJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(step1)
-                .end()
+                .start(persistenceStep)
+                .next(exportToXmlStep(jobRepository, null, null))
                 .build();
     }
 
     @Bean
-    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-            JdbcBatchItemWriter<Person> writer) {
-        return new StepBuilder("step1", jobRepository)
-                .<Person, Person>chunk(10, transactionManager)
+    public Step persistenceStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+            JdbcBatchItemWriter<Employee> writer) {
+        return new StepBuilder("persistenceStep", jobRepository)
+                .<Employee, Employee>chunk(10, transactionManager)
                 .reader(reader())
                 .processor(processor())
+                .writer(writer)
+                .build();
+    }
+
+    @Bean
+    public Step exportToXmlStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+            ItemWriter<EmployeeVO> writer) {
+        return new StepBuilder("exportToXmlStep", jobRepository)
+                .<Employee, EmployeeVO>chunk(10, transactionManager)
+                .reader(employeeItemReader())
+                .processor(employeeConverterProcessor())
                 .writer(writer)
                 .build();
     }
