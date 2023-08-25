@@ -1,44 +1,63 @@
 package com.giovannicarmo.springbatchtutorial.generator.xml;
 
+import java.time.LocalDateTime;
 import java.util.Set;
-
-import com.giovannicarmo.springbatchtutorial.generator.valueobject.Header;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "root")
 @XmlAccessorType(XmlAccessType.NONE)
-public class XmlWrapper<T> {
-
-    private String rootElementName;
+public abstract class XmlWrapper<T> {
 
     @XmlElement(name = "Header")
     private Header header;
 
-    @XmlElement(name = "items")
+    @XmlElement(name = "Item")
     private Set<T> items;
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    protected static class Header {
+        @XmlElement(name = "OPERATION_ID")
+        private String operationId;
+
+        @XmlElement(name = "GENERATED_AT")
+        private String generatedAt;
+
+        public Header() {
+        }
+
+        public Header(String operationId) {
+            this.operationId = operationId;
+            this.generatedAt = LocalDateTime.now().toString();
+        }
+
+        public String getOperationId() {
+            return operationId;
+        }
+
+        public void setOperationId(String operationId) {
+            this.operationId = operationId;
+        }
+
+        public String getGeneratedAt() {
+            return generatedAt;
+        }
+    }
 
     public XmlWrapper() {
     }
 
-    public XmlWrapper(String rootElementName, Header header, Set<T> items) {
-        this.rootElementName = rootElementName;
+    public XmlWrapper(Header header, Set<T> items) {
         this.header = header;
         this.items = items;
     }
 
-    public String getRootElementName() {
-        return rootElementName;
-    }
-
-    public Header getHeader() {
+    public XmlWrapper.Header getHeader() {
         return header;
     }
 
-    public void setHeader(Header header) {
+    public void setHeader(XmlWrapper.Header header) {
         this.header = header;
     }
 

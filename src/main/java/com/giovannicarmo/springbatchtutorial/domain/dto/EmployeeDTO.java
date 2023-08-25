@@ -1,11 +1,13 @@
-package com.giovannicarmo.springbatchtutorial.generator.valueobject;
+package com.giovannicarmo.springbatchtutorial.domain.dto;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
+@XmlType(name = "x")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EmployeeVO {
+public class EmployeeDTO {
 
     @XmlElement(name = "EMPLOYEE_REGISTRATION_ID")
     private String employeeId;
@@ -19,10 +21,10 @@ public class EmployeeVO {
     @XmlElement(name = "EMPLOYEE_ROLE")
     private String position;
 
-    public EmployeeVO() {
+    public EmployeeDTO() {
     }
 
-    public EmployeeVO(String employeeId, String fullName, int age, String position) {
+    public EmployeeDTO(String employeeId, String fullName, int age, String position) {
         this.employeeId = employeeId;
         this.fullName = fullName;
         this.age = age;
@@ -77,7 +79,7 @@ public class EmployeeVO {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        EmployeeVO other = (EmployeeVO) obj;
+        EmployeeDTO other = (EmployeeDTO) obj;
         if (employeeId == null) {
             if (other.employeeId != null)
                 return false;

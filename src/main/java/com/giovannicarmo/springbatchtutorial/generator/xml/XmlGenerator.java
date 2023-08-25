@@ -5,8 +5,8 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.giovannicarmo.springbatchtutorial.generator.valueobject.EmployeeVO;
-import com.giovannicarmo.springbatchtutorial.generator.valueobject.Header;
+import com.giovannicarmo.springbatchtutorial.domain.dto.EmployeeDTO;
+import com.giovannicarmo.springbatchtutorial.generator.xml.XmlWrapper.Header;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -14,11 +14,12 @@ import jakarta.xml.bind.Marshaller;
 
 @Service
 public class XmlGenerator {
-    public void generate(String rootElementName, String operationId, Set<EmployeeVO> employeeVOs) throws JAXBException {
+    public void generate(String rootElementName, String operationId, Set<EmployeeDTO> employeeVOs)
+            throws JAXBException {
 
-        XmlWrapper<EmployeeVO> xmlWrapper = new XmlWrapper<>(rootElementName, new Header(operationId), employeeVOs);
+        XmlWrapper<EmployeeDTO> xmlWrapper = new XmlEmployee(new Header(operationId), employeeVOs);
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(XmlWrapper.class, EmployeeVO.class);
+        JAXBContext jaxbContext = JAXBContext.newInstance(XmlEmployee.class, EmployeeDTO.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 

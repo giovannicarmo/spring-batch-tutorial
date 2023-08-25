@@ -1,4 +1,4 @@
-package com.giovannicarmo.springbatchtutorial.domain;
+package com.giovannicarmo.springbatchtutorial.domain.entity;
 
 public abstract class Person {
 

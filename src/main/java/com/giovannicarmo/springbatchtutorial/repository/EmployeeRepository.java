@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import com.giovannicarmo.springbatchtutorial.domain.Employee;
+import com.giovannicarmo.springbatchtutorial.domain.entity.Employee;
 
 @Repository
 public class EmployeeRepository {

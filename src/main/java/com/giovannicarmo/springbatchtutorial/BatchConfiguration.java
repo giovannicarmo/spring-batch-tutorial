@@ -21,8 +21,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.giovannicarmo.springbatchtutorial.domain.Employee;
-import com.giovannicarmo.springbatchtutorial.generator.valueobject.EmployeeVO;
+import com.giovannicarmo.springbatchtutorial.domain.dto.EmployeeDTO;
+import com.giovannicarmo.springbatchtutorial.domain.entity.Employee;
 import com.giovannicarmo.springbatchtutorial.generator.xml.XmlGenerator;
 import com.giovannicarmo.springbatchtutorial.generator.xml.XmlItemWriter;
 import com.giovannicarmo.springbatchtutorial.processor.EmployeeConverterProcessor;
@@ -106,9 +106,9 @@ public class BatchConfiguration {
 
     @Bean
     public Step exportToXmlStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-            ItemWriter<EmployeeVO> writer) {
+            ItemWriter<EmployeeDTO> writer) {
         return new StepBuilder("exportToXmlStep", jobRepository)
-                .<Employee, EmployeeVO>chunk(10, transactionManager)
+                .<Employee, EmployeeDTO>chunk(10, transactionManager)
                 .reader(employeeItemReader())
                 .processor(employeeConverterProcessor())
                 .writer(writer)

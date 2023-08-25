@@ -1,4 +1,4 @@
-package com.giovannicarmo.springbatchtutorial.domain;
+package com.giovannicarmo.springbatchtutorial.domain.entity;
 
 public class Employee extends Person {
     private String employeeId;

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.NonNull;
 
-import com.giovannicarmo.springbatchtutorial.domain.Employee;
+import com.giovannicarmo.springbatchtutorial.domain.entity.Employee;
 
 public class EmployeeItemProcessor implements ItemProcessor<Employee, Employee> {
 

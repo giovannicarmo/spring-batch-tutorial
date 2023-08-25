@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.batch.item.ItemReader;
 
-import com.giovannicarmo.springbatchtutorial.domain.Employee;
+import com.giovannicarmo.springbatchtutorial.domain.entity.Employee;
 import com.giovannicarmo.springbatchtutorial.repository.EmployeeRepository;
 
 public class EmployeeItemReader implements ItemReader<Employee> {
