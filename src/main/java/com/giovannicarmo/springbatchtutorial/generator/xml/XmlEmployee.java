@@ -10,13 +10,13 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "EmployeesOfTheMonth")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class XmlEmployee extends XmlWrapper<EmployeeDTO> {
+public class XmlEmployee extends XmlTemplate<EmployeeDTO> {
 
     public XmlEmployee() {
         super();
     }
 
-    public XmlEmployee(XmlWrapper.Header header, Set<EmployeeDTO> employees) {
+    public XmlEmployee(XmlTemplate.Header header, Set<EmployeeDTO> employees) {
         super(header, employees);
     }
 }

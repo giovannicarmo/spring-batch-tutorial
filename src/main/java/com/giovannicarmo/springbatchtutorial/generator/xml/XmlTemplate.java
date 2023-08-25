@@ -8,7 +8,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public abstract class XmlWrapper<T> {
+public abstract class XmlTemplate<T> {
 
     @XmlElement(name = "Header")
     private Header header;
@@ -45,19 +45,19 @@ public abstract class XmlWrapper<T> {
         }
     }
 
-    public XmlWrapper() {
+    public XmlTemplate() {
     }
 
-    public XmlWrapper(Header header, Set<T> items) {
+    public XmlTemplate(Header header, Set<T> items) {
         this.header = header;
         this.items = items;
     }
 
-    public XmlWrapper.Header getHeader() {
+    public XmlTemplate.Header getHeader() {
         return header;
     }
 
-    public void setHeader(XmlWrapper.Header header) {
+    public void setHeader(XmlTemplate.Header header) {
         this.header = header;
     }
 

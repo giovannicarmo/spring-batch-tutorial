@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 import com.giovannicarmo.springbatchtutorial.domain.dto.EmployeeDTO;
-import com.giovannicarmo.springbatchtutorial.generator.xml.XmlWrapper.Header;
+import com.giovannicarmo.springbatchtutorial.generator.xml.XmlTemplate.Header;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -17,7 +17,7 @@ public class XmlGenerator {
     public void generate(String rootElementName, String operationId, Set<EmployeeDTO> employeeVOs)
             throws JAXBException {
 
-        XmlWrapper<EmployeeDTO> xmlWrapper = new XmlEmployee(new Header(operationId), employeeVOs);
+        XmlTemplate<EmployeeDTO> xmlWrapper = new XmlEmployee(new Header(operationId), employeeVOs);
 
         JAXBContext jaxbContext = JAXBContext.newInstance(XmlEmployee.class, EmployeeDTO.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
