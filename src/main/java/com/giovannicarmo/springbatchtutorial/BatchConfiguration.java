@@ -15,16 +15,18 @@ import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilde
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.batch.item.xml.builder.StaxEventItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.giovannicarmo.springbatchtutorial.domain.dto.EmployeeDTO;
 import com.giovannicarmo.springbatchtutorial.domain.entity.Employee;
-import com.giovannicarmo.springbatchtutorial.generator.xml.XmlGenerator;
-import com.giovannicarmo.springbatchtutorial.generator.xml.XmlItemWriter;
+import com.giovannicarmo.springbatchtutorial.generator.xml.XmlTemplate;
 import com.giovannicarmo.springbatchtutorial.processor.EmployeeConverterProcessor;
 import com.giovannicarmo.springbatchtutorial.processor.EmployeeItemProcessor;
 import com.giovannicarmo.springbatchtutorial.reader.EmployeeItemReader;
@@ -35,8 +37,6 @@ public class BatchConfiguration {
 
     @Autowired
     private EmployeeRepository employeeRepository;
-    @Autowired
-    private XmlGenerator xmlGenerator;
 
     @Bean
     public EmployeeItemProcessor processor() {
@@ -51,11 +51,6 @@ public class BatchConfiguration {
     @Bean
     public EmployeeItemReader employeeItemReader() {
         return new EmployeeItemReader(employeeRepository);
-    }
-
-    @Bean
-    public XmlItemWriter xmlItemWriter() {
-        return new XmlItemWriter(xmlGenerator);
     }
 
     @Bean
@@ -83,6 +78,21 @@ public class BatchConfiguration {
     }
 
     @Bean
+    ItemWriter<XmlTemplate<EmployeeDTO>> xmlEmployeeWriter() {
+        String exportFile = "contact-data.xml";
+
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setClassesToBeBound(XmlTemplate.class, EmployeeDTO.class);
+        return new StaxEventItemWriterBuilder<XmlTemplate<EmployeeDTO>>()
+                .name("xmlWriter")
+                .version("1.0")
+                .rootTagName("ContactList")
+                .resource(new FileSystemResource(exportFile))
+                .marshaller(marshaller)
+                .build();
+    }
+
+    @Bean
     public Job importUserJob(JobRepository jobRepository,
             JobCompletionNotificationListener listener, Step persistenceStep) {
         return new JobBuilder("importUserJob", jobRepository)
@@ -106,9 +116,9 @@ public class BatchConfiguration {
 
     @Bean
     public Step exportToXmlStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-            ItemWriter<EmployeeDTO> writer) {
+            ItemWriter<XmlTemplate<EmployeeDTO>> writer) {
         return new StepBuilder("exportToXmlStep", jobRepository)
-                .<Employee, EmployeeDTO>chunk(10, transactionManager)
+                .<Employee, XmlTemplate<EmployeeDTO>>chunk(10, transactionManager)
                 .reader(employeeItemReader())
                 .processor(employeeConverterProcessor())
                 .writer(writer)

@@ -6,18 +6,20 @@ import java.util.Set;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
-@XmlAccessorType(XmlAccessType.NONE)
-public abstract class XmlTemplate<T> {
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class XmlTemplate<T> {
 
     @XmlElement(name = "Header")
-    private Header header;
+    private XmlTemplate.Header header;
 
     @XmlElement(name = "Item")
     private Set<T> items;
 
     @XmlAccessorType(XmlAccessType.FIELD)
-    protected static class Header {
+    public static class Header {
         @XmlElement(name = "OPERATION_ID")
         private String operationId;
 
