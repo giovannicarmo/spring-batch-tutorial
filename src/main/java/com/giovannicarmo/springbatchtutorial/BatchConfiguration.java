@@ -1,5 +1,7 @@
 package com.giovannicarmo.springbatchtutorial;
 
+import java.util.Collections;
+
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
@@ -8,6 +10,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
@@ -17,7 +20,6 @@ import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.batch.item.xml.builder.StaxEventItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -34,12 +36,21 @@ import com.giovannicarmo.springbatchtutorial.repository.EmployeeRepository;
 import com.giovannicarmo.springbatchtutorial.ultils.XmlCustomHeaderCallback;
 
 import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 
 @Configuration
 public class BatchConfiguration {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Bean
+    public Jaxb2Marshaller marshaller() {
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setPackagesToScan("com.giovannicarmo.springbatchtutorial.domain.dto");
+        marshaller.setMarshallerProperties(Collections.singletonMap(Marshaller.JAXB_FRAGMENT, true));
+        return marshaller;
+    }
 
     @Bean
     public EmployeeItemProcessor processor() {
@@ -54,6 +65,12 @@ public class BatchConfiguration {
     @Bean
     public EmployeeItemReader employeeItemReader() {
         return new EmployeeItemReader(employeeRepository);
+    }
+
+    @Bean
+    @SuppressWarnings("unchecked")
+    public XmlWritter<EmployeeDTO> employeeXmlWritter() {
+        return new XmlWritter();
     }
 
     @Bean
@@ -103,7 +120,7 @@ public class BatchConfiguration {
             JobCompletionNotificationListener listener, Step persistenceStep) {
         return new JobBuilder("importUserJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
-                .listener(listener)
+                // .listener(listener)
                 .start(persistenceStep)
                 .next(exportToXmlStep(jobRepository, null, null))
                 .build();
@@ -122,12 +139,12 @@ public class BatchConfiguration {
 
     @Bean
     public Step exportToXmlStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-            @Qualifier("employeeWriter") StaxEventItemWriter<EmployeeDTO> writer) {
+            final ItemProcessor<Employee, EmployeeDTO> processor) {
         return new StepBuilder("exportToXmlStep", jobRepository)
                 .<Employee, EmployeeDTO>chunk(10, transactionManager)
                 .reader(employeeItemReader())
-                .processor(employeeConverterProcessor())
-                .writer(writer)
+                .processor(processor)
+                .writer(employeeXmlWritter())
                 .build();
     }
 }
