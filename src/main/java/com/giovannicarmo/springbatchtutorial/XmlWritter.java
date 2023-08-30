@@ -31,6 +31,8 @@ public class XmlWritter<T> implements ItemStreamWriter<T>, ItemWriteListener<T> 
             try (StringWriter writer = new StringWriter()) {
                 marshaller.marshal(item, new StreamResult(writer));
                 marshaledItems.add(writer.toString());
+            } catch (Exception e) {
+                throw e;
             }
         }
         chunkCount.incrementAndGet();
